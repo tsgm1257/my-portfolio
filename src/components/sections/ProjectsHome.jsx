@@ -2,17 +2,27 @@ import Section from "../Section.jsx";
 import { Link } from "react-router";
 import { FaFolderOpen } from "react-icons/fa6";
 import { projects } from "../../data/projects.js";
+import { motion } from "motion/react";
+import { staggerContainer, staggerItem } from "../anim.js";
 
 export default function ProjectsHome() {
-  const featured = projects.slice(0, 3); // take any 3
+  const featured = projects.slice(0, 3);
+
   return (
     <Section id="projects">
       <div className="flex items-center gap-3 mb-6">
         <FaFolderOpen /><h2 className="text-2xl md:text-3xl font-semibold">Projects</h2>
       </div>
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+
+      <motion.div
+        className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true, amount: 0.2 }}
+        variants={staggerContainer}
+      >
         {featured.map((p) => (
-          <div key={p.slug} className="card bg-base-200 hover:shadow-lg transition">
+          <motion.div key={p.slug} variants={staggerItem} className="card bg-base-200 hover:shadow-lg transition">
             <figure className="aspect-video overflow-hidden">
               <img src={p.cover} alt={`${p.name} cover`} className="object-cover w-full h-full" loading="lazy" />
             </figure>
@@ -23,9 +33,10 @@ export default function ProjectsHome() {
                 <Link to={`/projects/${p.slug}`} className="btn btn-primary btn-sm">View More / Details</Link>
               </div>
             </div>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
+
       <div className="text-right mt-6">
         <Link to="/projects" className="link link-primary">See all projects →</Link>
       </div>

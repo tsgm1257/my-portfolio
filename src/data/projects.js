@@ -2,67 +2,71 @@ export const projects = [
   {
     slug: "hobbyhub",
     name: "HobbyHub",
-    cover: "/images/hobbyhub-cover.jpg",
+    cover: "https://i.ibb.co/XkShDDQM/home3.png",
     images: [
-      "/images/hobbyhub-1.jpg",
-      "/images/hobbyhub-2.jpg"
+      "https://i.ibb.co/W4cNBLwf/groups.png",
+      "https://i.ibb.co/vCzv9SKN/group-details.png",
     ],
-    stack: ["React", "TypeScript", "Express", "MongoDB", "Firebase Auth", "Tailwind"],
+    stack: [
+      "React",
+      "TypeScript",
+      "Express",
+      "MongoDB",
+      "Firebase Auth",
+      "Tailwind",
+    ],
     description:
       "A platform to join or create local hobby-based groups with basic role management and secure routes.",
-    live: "https://example.com/hobbyhub",
-    githubClient: "https://github.com/you/hobbyhub-client",
+    live: "https://nimble-pixie-ed13e1.netlify.app",
+    githubClient: "https://github.com/tsgm1257/HobbyHub-Frontend",
     challenges: [
       "Protecting routes and handling token expiration cleanly",
-      "Designing a simple groups/roles structure"
+      "Designing a simple groups/roles structure",
     ],
     improvements: [
       "Real-time chat and event RSVPs",
-      "Offline-ready mobile experience"
-    ]
+      "Offline-ready mobile experience",
+    ],
   },
   {
     slug: "foodshare",
     name: "FoodShare",
-    cover: "/images/foodshare-cover.jpg",
+    cover: "https://i.ibb.co/zWNgfcN6/home.png",
     images: [
-      "/images/foodshare-1.jpg",
-      "/images/foodshare-2.jpg"
+      "https://i.ibb.co/9Hm2qH9F/foods.png",
+      "https://i.ibb.co/Jj2S9m8Z/food-details.png",
     ],
     stack: ["React", "Node.js", "Express", "MongoDB", "JWT", "Tailwind"],
     description:
       "Share surplus food safely. Users can list food, request pickups, and track request status.",
-    live: "https://example.com/foodshare",
-    githubClient: "https://github.com/you/foodshare-client",
+    live: "https://food-sharing-app-client-side.netlify.app",
+    githubClient: "https://github.com/tsgm1257/Food-Sharing-App-Client-Side",
     challenges: [
       "Modeling request lifecycle cleanly",
-      "Keeping UI responsive on slow networks"
+      "Keeping UI responsive on slow networks",
     ],
     improvements: [
       "Push notifications for status changes",
-      "Geo-based search and filters"
-    ]
+      "Geo-based search and filters",
+    ],
   },
   {
     slug: "building-manager",
     name: "Building Manager",
-    cover: "/images/building-cover.jpg",
+    cover: "https://i.ibb.co/V0Rq7SCm/home2.png",
     images: [
-      "/images/building-1.jpg",
-      "/images/building-2.jpg"
+      "https://i.ibb.co/zTXdf2TY/apartments.png",
+      "https://i.ibb.co/9mskGQWy/dashboard.png",
     ],
     stack: ["React", "TypeScript", "Firebase", "Tailwind", "DaisyUI"],
     description:
       "Manage apartments, announcements, payments, coupons, and member dashboards with auth.",
-    live: "https://example.com/building-manager",
-    githubClient: "https://github.com/you/building-manager-client",
+    live: "https://building-management-913d1.web.app",
+    githubClient: "https://github.com/tsgm1257/Building-Management-Client-Side",
     challenges: [
       "Role-based UI without over-complicating routes",
-      "Consistent data formatting and validation"
+      "Consistent data formatting and validation",
     ],
-    improvements: [
-      "Admin analytics dashboards",
-      "Automated invoice emails"
-    ]
-  }
+    improvements: ["Admin analytics dashboards", "Automated invoice emails"],
+  },
 ];
