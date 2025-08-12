@@ -7,9 +7,7 @@ Sections: **Hero, About, Skills, Education, Projects, Contact** — all aligned 
 
 ---
 
-## Live Site
-
-**Frontend:** [https://food-sharing-app-client-side.netlify.app](https://food-sharing-app-client-side.netlify.app)
+**Live Link:** [https://tanzeemsiddique.netlify.app/](https://tanzeemsiddique.netlify.app/)
 
 ---
 
