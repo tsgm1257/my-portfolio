@@ -93,6 +93,7 @@ export default function Hero() {
             </div>
 
             {/* Right: photo */}
+            
             <motion.div
               className="justify-self-center order-first md:order-none"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -100,12 +101,22 @@ export default function Hero() {
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             >
-              <img
-                src={site.photo}
-                alt={`Professional headshot of ${site.name}`}
-                className="w-56 h-56 md:w-72 md:h-72 rounded-full object-cover shadow-lg"
-                loading="lazy"
-              />
+              <div className="relative w-72 h-[22rem] sm:w-80 sm:h-[26rem] md:w-96 md:h-[30rem] overflow-hidden rounded-2xl border border-base-300 shadow-lg">
+                <img
+                  src={site.photo2x || site.photo} 
+                  srcSet={
+                    site.photo2x
+                      ? `${site.photo} 1x, ${site.photo2x} 2x`
+                      : undefined
+                  }
+                  sizes="(min-width:1024px) 24rem, (min-width:640px) 20rem, 18rem"
+                  alt={`Professional headshot of ${site.name}`}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  fetchpriority="high"
+                  decoding="async"
+                />
+              </div>
             </motion.div>
           </div>
         </div>

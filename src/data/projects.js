@@ -2,6 +2,8 @@ export const projects = [
   {
     slug: "hobbyhub",
     name: "HobbyHub",
+    released: "May 2025",
+    releasedAt: "2025-05-01",
     cover: "https://i.ibb.co/XkShDDQM/home3.png",
     images: [
       "https://i.ibb.co/W4cNBLwf/groups.png",
@@ -9,11 +11,12 @@ export const projects = [
     ],
     stack: [
       "React",
-      "TypeScript",
+      "JavaScript",
       "Express",
       "MongoDB",
-      "Firebase Auth",
+      "Firebase",
       "Tailwind",
+      "DaisyUI",
     ],
     description:
       "A platform to join or create local hobby-based groups with basic role management and secure routes.",
@@ -31,12 +34,21 @@ export const projects = [
   {
     slug: "foodshare",
     name: "FoodShare",
+    released: "June 2025",
+    releasedAt: "2025-06-01",
     cover: "https://i.ibb.co/zWNgfcN6/home.png",
     images: [
       "https://i.ibb.co/9Hm2qH9F/foods.png",
       "https://i.ibb.co/Jj2S9m8Z/food-details.png",
     ],
-    stack: ["React", "Node.js", "Express", "MongoDB", "JWT", "Tailwind"],
+    stack: [
+      "React",
+      "Node.js",
+      "Express",
+      "MongoDB",
+      "Tailwind",
+      "DaisyUI",
+    ],
     description:
       "Share surplus food safely. Users can list food, request pickups, and track request status.",
     live: "https://food-sharing-app-client-side.netlify.app",
@@ -53,12 +65,14 @@ export const projects = [
   {
     slug: "building-manager",
     name: "Building Manager",
+    released: "July 2025",
+    releasedAt: "2025-07-01",
     cover: "https://i.ibb.co/V0Rq7SCm/home2.png",
     images: [
       "https://i.ibb.co/zTXdf2TY/apartments.png",
       "https://i.ibb.co/9mskGQWy/dashboard.png",
     ],
-    stack: ["React", "TypeScript", "Firebase", "Tailwind", "DaisyUI"],
+    stack: ["React", "Firebase", "Tailwind", "DaisyUI", "Express", "MongoDB"],
     description:
       "Manage apartments, announcements, payments, coupons, and member dashboards with auth.",
     live: "https://building-management-913d1.web.app",

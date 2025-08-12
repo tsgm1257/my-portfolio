@@ -1,7 +1,8 @@
 import Section from "../Section.jsx";
-import { FaUser } from "react-icons/fa6";
 import { motion } from "motion/react";
 import { staggerContainer, staggerItem } from "../anim.js";
+import { site } from "../../data/site.js";
+import { FaUser } from "react-icons/fa6";
 
 export default function About() {
   return (
@@ -14,68 +15,98 @@ export default function About() {
         className="card bg-base-100 border border-base-200 shadow-xl rounded-3xl"
       >
         <div className="card-body p-6 md:p-10">
-          {/* Heading */}
+          {/* Title with icon (matches other sections) */}
           <motion.div
-            className="flex items-center gap-3 mb-4"
+            className="flex items-center gap-3 mb-6"
             variants={staggerItem}
           >
             <FaUser className="text-xl" />
             <h2 className="text-2xl md:text-3xl font-semibold">About Me</h2>
           </motion.div>
 
-          {/* Intro / Journey */}
-          <motion.div className="space-y-3" variants={staggerItem}>
-            <p className="text-base md:text-lg">
-              {/* TODO: Replace with your story */}I started my programming
-              journey in <strong>20XX</strong>, building small utilities and web
-              apps. Over time I shifted toward creating clean UIs and reliable
-              APIs that solve real problems.
-            </p>
-          </motion.div>
+          {/* Layout */}
+          <div className="grid lg:grid-cols-3 gap-8">
+            {/* Left: narrative */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Intro */}
+              <motion.p
+                className="text-base md:text-lg opacity-90"
+                variants={staggerItem}
+              >
+                {site.intro}
+              </motion.p>
 
-          {/* What I enjoy */}
-          <motion.div className="mt-6 space-y-2" variants={staggerItem}>
-            <h3 className="text-lg md:text-xl font-semibold">What I Enjoy</h3>
-            <ul className="list-disc pl-6 space-y-1">
-              {/* TODO: Replace with your preferences */}
-              <li>Designing responsive, accessible interfaces.</li>
-              <li>Building scalable REST APIs with clear contracts.</li>
-              <li>Iterating fast with type-safe, maintainable code.</li>
-            </ul>
-          </motion.div>
+              {/* Journey */}
+              {site.journey?.length > 0 && (
+                <motion.section variants={staggerItem}>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">
+                    My Programming Journey
+                  </h3>
+                  <ul className="list-disc pl-6 space-y-1">
+                    {site.journey.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                </motion.section>
+              )}
 
-          {/* Hobbies / interests */}
-          <motion.div className="mt-6 space-y-2" variants={staggerItem}>
-            <h3 className="text-lg md:text-xl font-semibold">
-              Outside of Code
-            </h3>
-            <p>
-              {/* TODO: Replace with your hobbies */}I enjoy football, community
-              service, and teaching. These keep me balanced and sharpen my
-              communication and leadership skills.
-            </p>
-          </motion.div>
+              {/* Enjoy */}
+              {site.enjoy?.length > 0 && (
+                <motion.section variants={staggerItem}>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">
+                    What I Enjoy
+                  </h3>
+                  <ul className="list-disc pl-6 space-y-1">
+                    {site.enjoy.map((line, i) => (
+                      <li key={i}>{line}</li>
+                    ))}
+                  </ul>
+                </motion.section>
+              )}
 
-          {/* Personality */}
-          <motion.div className="mt-6 space-y-2" variants={staggerItem}>
-            <h3 className="text-lg md:text-xl font-semibold">Personality</h3>
-            <p>
-              {/* TODO: Replace with your traits */}
-              Pragmatic, detail-oriented, and collaborative. I love clear
-              naming, consistent patterns, and small, steady improvements.
-            </p>
-          </motion.div>
+              {/* Hobbies */}
+              {site.hobbies?.length > 0 && (
+                <motion.section variants={staggerItem}>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">
+                    Outside of Code
+                  </h3>
+                  <p>{site.hobbies.join(" · ")}</p>
+                </motion.section>
+              )}
 
-          {/* Quick facts chips (optional) */}
-          <motion.div
-            className="mt-6 flex flex-wrap gap-2"
-            variants={staggerItem}
-          >
-            {/* TODO: Edit or remove */}
-            <span className="badge badge-outline">Remote-friendly</span>
-            <span className="badge badge-outline">Open to internships</span>
-            <span className="badge badge-outline">Mentoring</span>
-          </motion.div>
+              {/* Personality */}
+              {site.traits?.length > 0 && (
+                <motion.section variants={staggerItem}>
+                  <h3 className="text-lg md:text-xl font-semibold mb-2">
+                    Personality
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {site.traits.map((t, i) => (
+                      <span key={i} className="badge badge-outline">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                </motion.section>
+              )}
+            </div>
+
+            {/* Right: quick facts */}
+            <motion.aside className="space-y-4" variants={staggerItem}>
+              <div className="card bg-base-200">
+                <div className="card-body">
+                  <h4 className="card-title">Quick Facts</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {(site.quickFacts || []).map((q, i) => (
+                      <span key={i} className="badge">
+                        {q}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </motion.aside>
+          </div>
         </div>
       </motion.div>
     </Section>

@@ -24,15 +24,21 @@ import { motion } from "motion/react";
 import { staggerContainer, staggerItem } from "../anim.js";
 import { demos } from "../../data/demoCode.js";
 
+/* -------------------- helpers -------------------- */
+
 function SkillChip({ item, onPick }) {
   const { name, Icon, demo } = item;
+  const clickable = Boolean(demo);
   return (
     <motion.button
       type="button"
       title={name}
       variants={staggerItem}
-      onClick={() => onPick(demo)}
-      className="w-12 h-12 rounded-xl flex items-center justify-center shadow-sm tooltip tooltip-bottom bg-neutral text-neutral-content hover:scale-105 transition"
+      onClick={() => clickable && onPick(demo)}
+      className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-sm tooltip tooltip-bottom
+        ${
+          clickable ? "hover:scale-105 transition" : ""
+        } bg-neutral text-neutral-content`}
       data-tip={name}
       aria-label={name}
     >
@@ -40,6 +46,8 @@ function SkillChip({ item, onPick }) {
     </motion.button>
   );
 }
+
+/* -------------------- data -------------------- */
 
 const categories = [
   {
@@ -76,7 +84,7 @@ const categories = [
     key: "tools",
     title: "Tools",
     items: [
-      { name: "Git", Icon: SiGit, demo: "git" },
+      { name: "Git", Icon: SiGit, demo: "git" }, // only Tools demo
       { name: "GitHub", Icon: SiGithub, demo: null },
       { name: "Vercel", Icon: SiVercel, demo: null },
       { name: "Netlify", Icon: SiNetlify, demo: null },
@@ -85,22 +93,175 @@ const categories = [
   },
 ];
 
+const ORDER = categories.map((c) => c.key);
+const DURATION_MS = 3800; // time per snippet
+const PROGRESS_TICK = 40; // progress update cadence (ms)
+
+/* -------------------- component -------------------- */
+
 export default function Skills() {
-  const [active, setActive] = useState("languages");
-  const [picked, setPicked] = useState(null);
+  const [active, setActive] = useState(ORDER[0]); // tab key
+  const [catIndex, setCatIndex] = useState(0); // index in ORDER
+  const [itemIndex, setItemIndex] = useState(0); // index within demos
+  const [picked, setPicked] = useState(null); // current demo key
+
+  // progress + pause/resume bookkeeping
+  const [progress, setProgress] = useState(0); // 0..100
+  const [accMs, setAccMs] = useState(0); // accumulated elapsed while playing
+  const [lastResumeAt, setLastResumeAt] = useState(null); // timestamp when resumed
+  const [isVisible, setIsVisible] = useState(false);
+
+  const cardRef = useRef(null);
   const demoRef = useRef(null);
 
-  useEffect(() => setPicked(null), [active]);
-  useEffect(() => {
-    if (picked && demoRef.current)
-      demoRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  }, [picked]);
-
-  const current = useMemo(
+  // derived
+  const currentCat = useMemo(
     () => categories.find((c) => c.key === active) ?? categories[0],
     [active]
   );
+  const currentDemos = useMemo(
+    () => (currentCat?.items ?? []).filter((i) => Boolean(i.demo)),
+    [currentCat]
+  );
   const demo = picked ? demos[picked] : null;
+
+  /* -------- visibility: pause when out of view -------- */
+  useEffect(() => {
+    const el = cardRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([entry]) =>
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio >= 0.3),
+      { threshold: [0, 0.3, 1] }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // when visibility flips: update timers to pause/resume cleanly
+  useEffect(() => {
+    if (!picked) return;
+    if (isVisible) {
+      // resume
+      setLastResumeAt(Date.now());
+    } else {
+      // pause — add elapsed since last resume to accumulated
+      setAccMs((prev) => prev + (lastResumeAt ? Date.now() - lastResumeAt : 0));
+      setLastResumeAt(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isVisible, picked]);
+
+  /* -------- initial: open first available demo -------- */
+  useEffect(() => {
+    const firstCatIdx = categories.findIndex((c) =>
+      c.items.some((i) => i.demo)
+    );
+    const idx = firstCatIdx >= 0 ? firstCatIdx : 0;
+    const cat = categories[idx];
+    const firstDemoItem = cat.items.find((i) => i.demo) ?? null;
+
+    setActive(cat.key);
+    setCatIndex(idx);
+    setItemIndex(0);
+    setPicked(firstDemoItem?.demo ?? null);
+
+    // init timers
+    setAccMs(0);
+    setLastResumeAt(null);
+    setProgress(0);
+  }, []);
+
+  /* -------- autoplay tick (respects visibility) -------- */
+  useEffect(() => {
+    if (!picked) return;
+    const id = setInterval(() => {
+      const elapsed =
+        accMs + (isVisible && lastResumeAt ? Date.now() - lastResumeAt : 0);
+      const pct = Math.min(100, (elapsed / DURATION_MS) * 100);
+      setProgress(pct);
+      if (elapsed >= DURATION_MS) {
+        clearInterval(id);
+        advance(false); // autoplay advance
+      }
+    }, PROGRESS_TICK);
+    return () => clearInterval(id);
+  }, [picked, accMs, lastResumeAt, isVisible, active]);
+
+  // reset timers whenever we switch snippet
+  useEffect(() => {
+    if (!picked) return;
+    setAccMs(0);
+    setLastResumeAt(isVisible ? Date.now() : null);
+    setProgress(0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [picked]);
+
+  /* -------------------- controls -------------------- */
+
+  const scrollDemoIntoView = () => {
+    if (!demoRef.current) return;
+    demoRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
+
+  const advance = (userInitiated = false) => {
+    if (currentDemos.length === 0) {
+      goToNextTabWithDemo(userInitiated);
+      return;
+    }
+    const nextItemIndex = itemIndex + 1;
+    if (nextItemIndex < currentDemos.length) {
+      setItemIndex(nextItemIndex);
+      setPicked(currentDemos[nextItemIndex].demo);
+    } else {
+      goToNextTabWithDemo(userInitiated);
+    }
+    if (userInitiated) setTimeout(scrollDemoIntoView, 0);
+  };
+
+  const goToNextTabWithDemo = (userInitiated = false) => {
+    for (let step = 1; step <= ORDER.length; step++) {
+      const idx = (catIndex + step) % ORDER.length;
+      const targetCat = categories.find((c) => c.key === ORDER[idx]);
+      if (!targetCat) continue;
+      const firstDemoItem = targetCat.items.find((i) => i.demo);
+      if (firstDemoItem) {
+        setActive(targetCat.key);
+        setCatIndex(idx);
+        setItemIndex(0);
+        setPicked(firstDemoItem.demo);
+        if (userInitiated) setTimeout(scrollDemoIntoView, 0);
+        return;
+      }
+    }
+    // nothing left with a demo
+    setPicked(null);
+  };
+
+  const onTabClick = (key) => {
+    const idx = ORDER.indexOf(key);
+    const cat = categories[idx];
+    setActive(key);
+    setCatIndex(idx);
+    const firstDemoItem = cat.items.find((i) => i.demo);
+    setItemIndex(0);
+    setPicked(firstDemoItem ? firstDemoItem.demo : null);
+    setProgress(0);
+    setAccMs(0);
+    setLastResumeAt(isVisible ? Date.now() : null);
+    setTimeout(scrollDemoIntoView, 0);
+  };
+
+  const onPick = (demoKey) => {
+    if (!demoKey) return;
+    const idx = currentDemos.findIndex((i) => i.demo === demoKey);
+    setItemIndex(idx >= 0 ? idx : 0);
+    setPicked(demoKey);
+    setProgress(0);
+    setAccMs(0);
+    setLastResumeAt(isVisible ? Date.now() : null);
+    setTimeout(scrollDemoIntoView, 0);
+  };
 
   const copyCode = async () => {
     if (!demo) return;
@@ -109,9 +270,12 @@ export default function Skills() {
     } catch {}
   };
 
+  /* -------------------- render -------------------- */
+
   return (
     <Section id="skills">
       <motion.div
+        ref={cardRef}
         initial="hidden"
         whileInView="show"
         viewport={{ once: true, amount: 0.25 }}
@@ -119,6 +283,7 @@ export default function Skills() {
         className="card bg-base-100 border border-base-200 shadow-xl rounded-3xl"
       >
         <div className="card-body p-6 md:p-10">
+          {/* Heading */}
           <motion.div
             className="flex items-center gap-3 mb-4"
             variants={staggerItem}
@@ -127,7 +292,7 @@ export default function Skills() {
             <h2 className="text-2xl md:text-3xl font-semibold">Skills</h2>
           </motion.div>
 
-          {/* Pills */}
+          {/* Category pills */}
           <motion.div
             className="flex flex-wrap gap-2"
             variants={staggerItem}
@@ -140,7 +305,7 @@ export default function Skills() {
                 type="button"
                 role="tab"
                 aria-selected={c.key === active}
-                onClick={() => setActive(c.key)}
+                onClick={() => onTabClick(c.key)}
                 className={`btn btn-sm ${
                   c.key === active ? "btn-primary" : "btn-ghost"
                 } rounded-full`}
@@ -150,20 +315,20 @@ export default function Skills() {
             ))}
           </motion.div>
 
-          {/* Icons */}
+          {/* Icon chips */}
           <motion.div
-            key={current.key}
+            key={currentCat.key}
             className="mt-6 flex flex-wrap gap-3"
             initial="hidden"
             animate="show"
             variants={staggerContainer}
           >
-            {current.items.map((item) => (
-              <SkillChip key={item.name} item={item} onPick={setPicked} />
+            {currentCat.items.map((item) => (
+              <SkillChip key={item.name} item={item} onPick={onPick} />
             ))}
           </motion.div>
 
-          {/* Micro-demo */}
+          {/* Micro-demo card */}
           {demo && (
             <motion.div
               ref={demoRef}
@@ -186,12 +351,22 @@ export default function Skills() {
                     </button>
                     <button
                       className="btn btn-ghost btn-sm"
-                      onClick={() => setPicked(null)}
+                      onClick={() => advance(true)}
                     >
-                      Close
+                      Next ▶
                     </button>
                   </div>
                 </div>
+
+                {/* Progress (pauses while out of view) */}
+                <div className="mt-3">
+                  <progress
+                    className="progress w-full"
+                    value={progress}
+                    max="100"
+                  />
+                </div>
+
                 <pre className="mt-3 p-4 rounded-xl bg-base-100 overflow-auto text-sm">
                   <code>{demo.code}</code>
                 </pre>
