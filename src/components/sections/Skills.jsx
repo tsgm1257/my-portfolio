@@ -1,5 +1,6 @@
+// src/components/sections/Skills.jsx
 import Section from "../Section.jsx";
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect, useMemo, useCallback } from "react";
 import { FaCode } from "react-icons/fa6";
 import {
   SiJavascript,
@@ -24,8 +25,7 @@ import { motion } from "motion/react";
 import { staggerContainer, staggerItem } from "../anim.js";
 import { demos } from "../../data/demoCode.js";
 
-/* -------------------- helpers -------------------- */
-
+/* -------------------- chip -------------------- */
 function SkillChip({ item, onPick }) {
   const { name, Icon, demo } = item;
   const clickable = Boolean(demo);
@@ -48,7 +48,6 @@ function SkillChip({ item, onPick }) {
 }
 
 /* -------------------- data -------------------- */
-
 const categories = [
   {
     key: "languages",
@@ -94,21 +93,20 @@ const categories = [
 ];
 
 const ORDER = categories.map((c) => c.key);
-const DURATION_MS = 3800; // time per snippet
-const PROGRESS_TICK = 40; // progress update cadence (ms)
+const DURATION_MS = 3800; // per-snippet time
+const PROGRESS_TICK = 40; // ms
 
 /* -------------------- component -------------------- */
-
 export default function Skills() {
-  const [active, setActive] = useState(ORDER[0]); // tab key
-  const [catIndex, setCatIndex] = useState(0); // index in ORDER
-  const [itemIndex, setItemIndex] = useState(0); // index within demos
-  const [picked, setPicked] = useState(null); // current demo key
+  const [active, setActive] = useState(ORDER[0]);
+  const [catIndex, setCatIndex] = useState(0);
+  const [itemIndex, setItemIndex] = useState(0);
+  const [picked, setPicked] = useState(null);
 
-  // progress + pause/resume bookkeeping
-  const [progress, setProgress] = useState(0); // 0..100
-  const [accMs, setAccMs] = useState(0); // accumulated elapsed while playing
-  const [lastResumeAt, setLastResumeAt] = useState(null); // timestamp when resumed
+  // progress / pause bookkeeping
+  const [progress, setProgress] = useState(0);
+  const [accMs, setAccMs] = useState(0);
+  const [lastResumeAt, setLastResumeAt] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
   const cardRef = useRef(null);
@@ -125,7 +123,7 @@ export default function Skills() {
   );
   const demo = picked ? demos[picked] : null;
 
-  /* -------- visibility: pause when out of view -------- */
+  /* ---- pause when section is off-screen ---- */
   useEffect(() => {
     const el = cardRef.current;
     if (!el) return;
@@ -138,21 +136,18 @@ export default function Skills() {
     return () => io.disconnect();
   }, []);
 
-  // when visibility flips: update timers to pause/resume cleanly
   useEffect(() => {
     if (!picked) return;
     if (isVisible) {
-      // resume
       setLastResumeAt(Date.now());
     } else {
-      // pause — add elapsed since last resume to accumulated
       setAccMs((prev) => prev + (lastResumeAt ? Date.now() - lastResumeAt : 0));
       setLastResumeAt(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isVisible, picked]);
 
-  /* -------- initial: open first available demo -------- */
+  /* ---- initial: open first available demo ---- */
   useEffect(() => {
     const firstCatIdx = categories.findIndex((c) =>
       c.items.some((i) => i.demo)
@@ -166,13 +161,57 @@ export default function Skills() {
     setItemIndex(0);
     setPicked(firstDemoItem?.demo ?? null);
 
-    // init timers
     setAccMs(0);
     setLastResumeAt(null);
     setProgress(0);
   }, []);
 
-  /* -------- autoplay tick (respects visibility) -------- */
+  /* -------------------- stable helpers -------------------- */
+  const scrollDemoIntoView = useCallback(() => {
+    if (!demoRef.current) return;
+    demoRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, []);
+
+  const goToNextTabWithDemo = useCallback(
+    (userInitiated = false) => {
+      for (let step = 1; step <= ORDER.length; step++) {
+        const idx = (catIndex + step) % ORDER.length;
+        const targetCat = categories.find((c) => c.key === ORDER[idx]);
+        if (!targetCat) continue;
+        const firstDemoItem = targetCat.items.find((i) => i.demo);
+        if (firstDemoItem) {
+          setActive(targetCat.key);
+          setCatIndex(idx);
+          setItemIndex(0);
+          setPicked(firstDemoItem.demo);
+          if (userInitiated) setTimeout(scrollDemoIntoView, 0);
+          return;
+        }
+      }
+      setPicked(null); // nothing left with demos
+    },
+    [catIndex, scrollDemoIntoView]
+  );
+
+  const advance = useCallback(
+    (userInitiated = false) => {
+      if (currentDemos.length === 0) {
+        goToNextTabWithDemo(userInitiated);
+        return;
+      }
+      const nextItemIndex = itemIndex + 1;
+      if (nextItemIndex < currentDemos.length) {
+        setItemIndex(nextItemIndex);
+        setPicked(currentDemos[nextItemIndex].demo);
+      } else {
+        goToNextTabWithDemo(userInitiated);
+      }
+      if (userInitiated) setTimeout(scrollDemoIntoView, 0);
+    },
+    [currentDemos, itemIndex, goToNextTabWithDemo, scrollDemoIntoView]
+  );
+
+  /* ---- autoplay tick (respects visibility) ---- */
   useEffect(() => {
     if (!picked) return;
     const id = setInterval(() => {
@@ -182,13 +221,13 @@ export default function Skills() {
       setProgress(pct);
       if (elapsed >= DURATION_MS) {
         clearInterval(id);
-        advance(false); // autoplay advance
+        advance(false); // autoplay
       }
     }, PROGRESS_TICK);
     return () => clearInterval(id);
-  }, [picked, accMs, lastResumeAt, isVisible, active]);
+  }, [picked, accMs, lastResumeAt, isVisible, active, advance]);
 
-  // reset timers whenever we switch snippet
+  // reset timers when snippet changes
   useEffect(() => {
     if (!picked) return;
     setAccMs(0);
@@ -197,47 +236,7 @@ export default function Skills() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [picked]);
 
-  /* -------------------- controls -------------------- */
-
-  const scrollDemoIntoView = () => {
-    if (!demoRef.current) return;
-    demoRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  };
-
-  const advance = (userInitiated = false) => {
-    if (currentDemos.length === 0) {
-      goToNextTabWithDemo(userInitiated);
-      return;
-    }
-    const nextItemIndex = itemIndex + 1;
-    if (nextItemIndex < currentDemos.length) {
-      setItemIndex(nextItemIndex);
-      setPicked(currentDemos[nextItemIndex].demo);
-    } else {
-      goToNextTabWithDemo(userInitiated);
-    }
-    if (userInitiated) setTimeout(scrollDemoIntoView, 0);
-  };
-
-  const goToNextTabWithDemo = (userInitiated = false) => {
-    for (let step = 1; step <= ORDER.length; step++) {
-      const idx = (catIndex + step) % ORDER.length;
-      const targetCat = categories.find((c) => c.key === ORDER[idx]);
-      if (!targetCat) continue;
-      const firstDemoItem = targetCat.items.find((i) => i.demo);
-      if (firstDemoItem) {
-        setActive(targetCat.key);
-        setCatIndex(idx);
-        setItemIndex(0);
-        setPicked(firstDemoItem.demo);
-        if (userInitiated) setTimeout(scrollDemoIntoView, 0);
-        return;
-      }
-    }
-    // nothing left with a demo
-    setPicked(null);
-  };
-
+  /* -------------------- user actions -------------------- */
   const onTabClick = (key) => {
     const idx = ORDER.indexOf(key);
     const cat = categories[idx];
@@ -267,11 +266,12 @@ export default function Skills() {
     if (!demo) return;
     try {
       await navigator.clipboard.writeText(demo.code);
-    } catch {}
+    } catch {
+      // Silently handle clipboard errors
+    }
   };
 
   /* -------------------- render -------------------- */
-
   return (
     <Section id="skills">
       <motion.div
@@ -328,21 +328,24 @@ export default function Skills() {
             ))}
           </motion.div>
 
-          {/* Micro-demo card */}
+          {/* Micro-demo card (mobile-safe) */}
           {demo && (
             <motion.div
               ref={demoRef}
-              className="mt-8 card bg-base-200 rounded-2xl"
+              className="mt-8 card bg-base-200 rounded-2xl overflow-hidden"
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease: "easeOut" }}
             >
               <div className="card-body">
-                <div className="flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <h3 className="card-title">{demo.title}</h3>
+                {/* Header stacks on mobile to avoid overflow */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h3 className="card-title break-words">{demo.title}</h3>
                     {demo.lang && (
-                      <span className="badge badge-outline">{demo.lang}</span>
+                      <span className="badge badge-outline mt-1">
+                        {demo.lang}
+                      </span>
                     )}
                   </div>
                   <div className="flex items-center gap-2">
@@ -358,7 +361,7 @@ export default function Skills() {
                   </div>
                 </div>
 
-                {/* Progress (pauses while out of view) */}
+                {/* Progress (pauses off-screen) */}
                 <div className="mt-3">
                   <progress
                     className="progress w-full"
@@ -367,7 +370,8 @@ export default function Skills() {
                   />
                 </div>
 
-                <pre className="mt-3 p-4 rounded-xl bg-base-100 overflow-auto text-sm">
+                {/* Code: horizontal scroll if needed, never spills */}
+                <pre className="mt-3 p-3 sm:p-4 rounded-xl bg-base-100 overflow-x-auto w-full max-w-full text-xs sm:text-sm">
                   <code>{demo.code}</code>
                 </pre>
               </div>

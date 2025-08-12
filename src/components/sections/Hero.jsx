@@ -1,13 +1,12 @@
+// src/components/sections/Hero.jsx
 import Section from "../Section.jsx";
-import { useState } from "react";
 import { FaGithub, FaLinkedin, FaDownload } from "react-icons/fa6";
 import { motion } from "motion/react";
 import { staggerContainer, staggerItem } from "../anim.js";
 import { site } from "../../data/site.js";
+import { showResumeToast } from "../../lib/toast.js";
 
 export default function Hero() {
-  const [open, setOpen] = useState(false);
-
   const onResumeClick = () => {
     if (site.resume.url) {
       const a = document.createElement("a");
@@ -17,7 +16,7 @@ export default function Hero() {
       a.click();
       a.remove();
     } else {
-      setOpen(true);
+      showResumeToast();
     }
   };
 
@@ -29,12 +28,12 @@ export default function Hero() {
         whileInView="show"
         viewport={{ once: true, amount: 0.3 }}
         variants={staggerContainer}
-        className="card bg-base-100 border border-base-200 shadow-xl rounded-3xl"
+        className="card bg-base-100 border border-base-200 shadow-xl rounded-3xl overflow-hidden"
       >
         <div className="card-body p-6 md:p-10">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            {/* Left: text */}
-            <div>
+            {/* LEFT: text */}
+            <div className="min-w-0">
               <motion.p
                 className="text-sm tracking-wide text-primary"
                 variants={staggerItem}
@@ -46,16 +45,18 @@ export default function Hero() {
                 className="text-3xl md:text-5xl font-bold mt-1"
                 variants={staggerItem}
               >
-                Hi, I’m {site.name}
+                Hi, I'm {site.name}
               </motion.h1>
 
+              {/* Tagline */}
               <motion.p
-                className="mt-4 text-base md:text-lg opacity-90"
+                className="mt-4 text-sm sm:text-base leading-relaxed break-words"
                 variants={staggerItem}
               >
                 {site.tagline}
               </motion.p>
 
+              {/* CTAs */}
               <motion.div
                 className="mt-6 flex flex-wrap items-center gap-3"
                 variants={staggerItem}
@@ -92,8 +93,7 @@ export default function Hero() {
               </motion.div>
             </div>
 
-            {/* Right: photo */}
-            
+            {/* RIGHT: photo (bigger framed rectangle, crisp on retina) */}
             <motion.div
               className="justify-self-center order-first md:order-none"
               initial={{ opacity: 0, scale: 0.95 }}
@@ -103,7 +103,7 @@ export default function Hero() {
             >
               <div className="relative w-72 h-[22rem] sm:w-80 sm:h-[26rem] md:w-96 md:h-[30rem] overflow-hidden rounded-2xl border border-base-300 shadow-lg">
                 <img
-                  src={site.photo2x || site.photo} 
+                  src={site.photo2x || site.photo}
                   srcSet={
                     site.photo2x
                       ? `${site.photo} 1x, ${site.photo2x} 2x`
@@ -121,31 +121,6 @@ export default function Hero() {
           </div>
         </div>
       </motion.div>
-
-      {/* Resume modal (only when no resume url) */}
-      <dialog
-        className={`modal ${open ? "modal-open" : ""}`}
-        onClose={() => setOpen(false)}
-      >
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Resume</h3>
-          <p className="py-4">
-            Resume will be added later. Please check back soon.
-          </p>
-          <div className="modal-action">
-            <button className="btn" onClick={() => setOpen(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-        <form
-          method="dialog"
-          className="modal-backdrop"
-          onClick={() => setOpen(false)}
-        >
-          <button>close</button>
-        </form>
-      </dialog>
     </Section>
   );
 }

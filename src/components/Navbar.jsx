@@ -4,6 +4,7 @@ import PageContainer from "./PageContainer.jsx";
 import { useScrollSpy } from "../context/ScrollSpyContext.jsx";
 import { FaDownload } from "react-icons/fa6";
 import { site } from "../data/site.js";
+import { showResumeToast } from "../lib/toast.js";
 
 const nav = [
   { label: "About", to: "/#about", id: "about" },
@@ -15,18 +16,19 @@ const nav = [
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [resumeOpen, setResumeOpen] = useState(false);
   const { current } = useScrollSpy();
   const location = useLocation();
   const isHome = location.pathname === "/";
 
   const isActive = (item) =>
     item.label === "Projects"
-      ? location.pathname === "/projects" || (isHome && current === "projects")
+      ? isHome && current === "projects"
       : isHome && current === item.id;
 
   const itemClass = (item) =>
-    `hover:text-primary ${isActive(item) ? "text-primary font-medium" : ""}`;
+    `transition-colors hover:text-primary ${
+      isActive(item) ? "text-primary font-medium" : ""
+    }`;
 
   const onResumeClick = () => {
     if (site.resume.url) {
@@ -37,7 +39,7 @@ export default function Navbar() {
       a.click();
       a.remove();
     } else {
-      setResumeOpen(true);
+      showResumeToast(); 
     }
   };
 
@@ -63,7 +65,7 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Right: Resume button (desktop) */}
+        {/* Right: Resume (desktop) */}
         <div className="ml-auto hidden md:block">
           <button className="btn btn-primary btn-sm" onClick={onResumeClick}>
             <FaDownload className="mr-2" /> Resume
@@ -76,6 +78,7 @@ export default function Navbar() {
           onClick={() => setOpen((v) => !v)}
           aria-expanded={open}
           aria-controls="mobile-nav"
+          aria-label="Toggle menu"
         >
           Menu
         </button>
@@ -85,7 +88,6 @@ export default function Navbar() {
       {open && (
         <div id="mobile-nav" className="md:hidden border-t text-center">
           <PageContainer className="py-2 flex flex-col">
-            {/* Nav links */}
             {nav.map((item) => (
               <Link
                 key={item.label}
@@ -97,7 +99,6 @@ export default function Navbar() {
               </Link>
             ))}
 
-            {/* Resume on mobile */}
             <button
               className="btn btn-primary mb-2"
               onClick={() => {
@@ -110,31 +111,6 @@ export default function Navbar() {
           </PageContainer>
         </div>
       )}
-
-      {/* Resume modal (only when no resume url) */}
-      <dialog
-        className={`modal ${resumeOpen ? "modal-open" : ""}`}
-        onClose={() => setResumeOpen(false)}
-      >
-        <div className="modal-box">
-          <h3 className="font-bold text-lg">Resume</h3>
-          <p className="py-4">
-            Resume will be added later. Please check back soon.
-          </p>
-          <div className="modal-action">
-            <button className="btn" onClick={() => setResumeOpen(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-        <form
-          method="dialog"
-          className="modal-backdrop"
-          onClick={() => setResumeOpen(false)}
-        >
-          <button>close</button>
-        </form>
-      </dialog>
     </header>
   );
 }

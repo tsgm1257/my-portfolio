@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import Navbar from "../components/Navbar.jsx";
 import Footer from "../components/Footer.jsx";
 import { ScrollSpyProvider } from "../context/ScrollSpyContext.jsx";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function MainLayout() {
   const location = useLocation();
@@ -30,6 +32,17 @@ export default function MainLayout() {
         </main>
         <Footer />
       </ScrollSpyProvider>
+      
+      {/* Global toasts */}
+      <ToastContainer
+        position="top-center"
+        autoClose={3500}
+        newestOnTop
+        closeOnClick
+        pauseOnHover={false}
+        draggable={false}
+        theme="light"
+      />
     </div>
   );
 }

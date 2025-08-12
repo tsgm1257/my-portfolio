@@ -1,12 +1,89 @@
-# React + Vite
+# Tanzeem Siddique — Portfolio (React + Vite + Tailwind/DaisyUI)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Overview
 
-Currently, two official plugins are available:
+A clean, responsive developer portfolio built with **React (Vite)**, **Tailwind CSS**, **DaisyUI**, **Framer Motion**, **React Icons**, **React Toastify**, and **react-router**.  
+Sections: **Hero, About, Skills, Education, Projects, Contact** — all aligned to a shared container with smooth scroll-in animations.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+---
 
-## Expanding the ESLint configuration
+## Live Site
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Frontend:** [https://food-sharing-app-client-side.netlify.app](https://food-sharing-app-client-side.netlify.app)
+
+---
+
+
+## Features
+
+- **Responsive Navbar**  
+  Full-width background, centered links, and a Resume button that **downloads** a file if configured or shows a **Toast** if not ready.
+
+- **Hero**  
+  Designation, greeting, tagline, GitHub/LinkedIn links, and a **large rectangular framed photo** (hi-res supported via `photo2x`).
+
+- **About**  
+  Intro, programming journey, what you enjoy, hobbies, and personality traits — content driven from data.
+
+- **Skills**  
+  Category **tabs** + icon **chips** (tooltips).  
+  **Autoplay micro-demos** with a progress bar (beginner-friendly snippets), **pauses when section is off-screen**, and manual Next/Copy.
+
+- **Education**  
+  Example entry for **Fort Hays State University (2023 — Present)** with university link.
+
+- **Projects**  
+  Cards with cover, stack chips, and “View More / Details”.  
+  Details include stack, description, **release month + year**, live link, GitHub (client), challenges, and improvements.  
+  (Three sample projects: HobbyHub — May 2025, FoodShare — June 2025, Building Manager — July 2025.)
+
+- **Contact**  
+  Email / Phone / WhatsApp with action buttons and **copy to clipboard**.
+
+- **Footer**  
+  Brand, **Quick Links** (black → blue on hover, go to **home sections** including Projects), Contact, and Back-to-Top.
+
+- **Layout consistency**  
+  All sections use a shared `PageContainer` so the navbar/footer/sections align at every zoom level — no Tailwind config required.
+
+---
+
+## Tech Stack
+
+- **React** (Vite)
+- **Tailwind CSS** + **DaisyUI**
+- **Framer Motion**
+- **react-router** 
+- **React Icons**
+- **React Toastify** 
+
+---
+
+
+## Screenshots
+
+### Home
+
+![Home](public/screenshots/home.png)
+
+### Projects
+
+![Projects](public/screenshots/projects.png)
+
+---
+
+## Installation
+
+1. Clone the repository
+2. Run `npm install`
+3. Run the app locally:
+
+```
+npm run dev
+```
+
+---
+
+## Developed by
+
+Tanzeem Siddique

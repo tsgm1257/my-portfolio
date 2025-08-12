@@ -5,7 +5,6 @@ const ScrollSpyContext = createContext({ current: null });
 
 export function ScrollSpyProvider({
   children,
-  
   ids = ["about", "skills", "education", "projects", "contact"],
   offset = 80,
 }) {
@@ -38,11 +37,13 @@ export function ScrollSpyProvider({
 
     sections.forEach((s) => io.observe(s));
     return () => io.disconnect();
-  }, [location.pathname, offset]);
+  }, [location.pathname, ids, offset]);
 
   const value = useMemo(() => ({ current }), [current]);
   return (
-    <ScrollSpyContext.Provider value={value}>{children}</ScrollSpyContext.Provider>
+    <ScrollSpyContext.Provider value={value}>
+      {children}
+    </ScrollSpyContext.Provider>
   );
 }
 

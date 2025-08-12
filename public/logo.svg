@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="TS logo">
+  <!-- Frame -->
+  <rect x="8" y="8" width="112" height="112" rx="24" fill="none" stroke="currentColor" stroke-width="8"></rect>
+  <!-- TS -->
+  <text x="64" y="84" text-anchor="middle" font-family="Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial" font-weight="800" font-size="64" letter-spacing="-2" fill="currentColor">TS</text>
+</svg>

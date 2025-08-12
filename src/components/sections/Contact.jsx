@@ -30,7 +30,9 @@ export default function Contact() {
       await navigator.clipboard.writeText(text);
       setCopied(key);
       setTimeout(() => setCopied(""), 1200);
-    } catch {}
+    } catch {
+      // Silently handle clipboard errors
+    }
   };
 
   return (

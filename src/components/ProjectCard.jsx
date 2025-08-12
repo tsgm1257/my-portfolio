@@ -26,7 +26,7 @@ export default function ProjectCard({ project }) {
             to={`/projects/${project.slug}`}
             className="btn btn-primary btn-sm"
           >
-            View More / Details
+            View More
           </Link>
         </div>
       </div>
