@@ -1,1 +1,18 @@
-html { scroll-behavior: smooth; }
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  --tile-size: 720px;
+}
+html,
+body {
+  height: 100%;
+}
+html {
+  background-image: url("/tech-bg-tile.svg");  
+  background-repeat: repeat;                   
+  background-position: top left;
+  background-size: var(--tile-size) var(--tile-size);
+  background-color: #fff;
+}

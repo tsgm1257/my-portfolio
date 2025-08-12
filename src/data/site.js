@@ -2,7 +2,7 @@ export const site = {
   name: "Tanzeem Siddique",
   designation: "Full Stack Developer",
   tagline: "I build clean, responsive web apps with React, Node, and MongoDB.",
-  photo: "https://i.ibb.co/xpRGrHK/profile.png", // place in public/images/
+  photo: "https://i.ibb.co/xpRGrHK/profile.png",
   socials: {
     github: "https://github.com/tsgm1257",
     linkedin: "https://www.linkedin.com/in/tanzeem-siddique",

@@ -7,7 +7,6 @@ import { ScrollSpyProvider } from "../context/ScrollSpyContext.jsx";
 export default function MainLayout() {
   const location = useLocation();
 
-
   useEffect(() => {
     if (location.hash) {
       const id = location.hash.slice(1);
@@ -23,7 +22,7 @@ export default function MainLayout() {
   }, [location.pathname, location.hash]);
 
   return (
-    <div className="min-h-dvh bg-base-100 text-base-content">
+    <div className="min-h-dvh bg-transparent text-base-content">
       <ScrollSpyProvider>
         <Navbar />
         <main className="pt-16">
