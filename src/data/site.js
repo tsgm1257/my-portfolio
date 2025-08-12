@@ -12,7 +12,7 @@ export const site = {
   },
   contact: {
     email: "neaz1257@gmail.com",
-    phone: "+1 945 360 5010",
+    phone: "+19453605010",
     whatsapp: "17325588448", // digits only for wa.me; or "" to hide
   },
   resume: {
